@@ -1,0 +1,65 @@
+{
+  "lang_code": "fr",
+  "lang_native_name": "Français",
+  "formatting_locale": "fr_FR",
+  "ui": {
+    "page_title": "Tableau de bord de facturation · {company}",
+    "dashboard_title": "Tableau de bord de facturation",
+    "subtitle_period": "Période {start} – {end}",
+    "subtitle_count": "{count} factures analysées",
+    "kpi": {
+      "total_billed_net": "Chiffre d'affaires (HT)",
+      "total_billed_gross": "Chiffre d'affaires (TTC)",
+      "total_expenses_net": "Dépenses (HT)",
+      "balance_net": "Solde net",
+      "vat_collected": "TVA collectée",
+      "vat_paid": "TVA déductible",
+      "vat_to_settle": "TVA à régler",
+      "irpf_withheld": "Retenue à la source",
+      "average_invoice": "Facture moyenne",
+      "client_count": "Clients"
+    },
+    "sections": {
+      "monthly_evolution": "Évolution mensuelle",
+      "quarterly_vat": "Liquidation trimestrielle de la TVA",
+      "top_clients": "Meilleurs clients par chiffre d'affaires",
+      "invoice_detail": "Détail des factures",
+      "alerts": "Alertes et observations"
+    },
+    "table_headers": {
+      "date": "Date",
+      "number": "Numéro",
+      "issuer": "Émetteur",
+      "recipient": "Client",
+      "concept": "Description",
+      "net": "HT",
+      "vat": "TVA",
+      "irpf": "Retenue",
+      "total": "Total",
+      "type": "Type"
+    },
+    "type_labels": {
+      "ingreso": "Recette",
+      "gasto": "Dépense"
+    },
+    "quarters": {
+      "q1": "T1",
+      "q2": "T2",
+      "q3": "T3",
+      "q4": "T4"
+    },
+    "alerts": {
+      "client_dependency": "Le client « {client} » représente {pct} % du CA — dépendance élevée",
+      "month_no_billing": "Aucune facture émise en {month}",
+      "trend_up": "Tendance à la hausse (+{pct} % vs trimestre précédent)",
+      "trend_down": "Tendance à la baisse ({pct} % vs trimestre précédent)",
+      "trend_flat": "Tendance stable",
+      "missing_iva": "{count} facture(s) sans TVA détectée",
+      "mixed_currency": "Plusieurs devises détectées — totaux séparés par devise"
+    },
+    "footer": {
+      "generated_on": "Généré le {date}",
+      "powered_by": "Généré avec le kit Invoice Dashboard"
+    }
+  }
+}

@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tableau de bord de facturation · Estudio Creativo Vega SL</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --panel-2: #334155;
+      --ink: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --income: #4ade80;
+      --expense: #f87171;
+      --warn: #fbbf24;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 24px;
+      font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background: var(--bg); color: var(--ink);
+    }
+    header { margin-bottom: 32px; }
+    h1 { margin: 0 0 4px; font-size: 28px; font-weight: 600; }
+    .subtitle { color: var(--muted); font-size: 14px; }
+    section { margin-bottom: 40px; }
+    h2 {
+      font-size: 16px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--accent);
+      margin: 0 0 16px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    .kpi {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 8px; padding: 16px;
+    }
+    .kpi .label {
+      font-size: 11px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;
+    }
+    .kpi .value { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .kpi.income .value { color: var(--income); }
+    .kpi.expense .value { color: var(--expense); }
+
+    table {
+      width: 100%; border-collapse: collapse;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+    }
+    th, td {
+      padding: 10px 12px; text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-variant-numeric: tabular-nums;
+    }
+    th {
+      background: var(--panel-2); font-weight: 600;
+      font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+    td.num, th.num { text-align: right; }
+    tr:last-child td { border-bottom: none; }
+
+    .chart { background: var(--panel); border: 1px solid var(--border);
+             border-radius: 8px; padding: 20px; }
+    .bars { display: flex; align-items: flex-end; gap: 12px; height: 220px;
+            padding: 0 8px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: stretch;
+               gap: 4px; min-width: 0; }
+    .bar-stack { flex: 1; display: flex; flex-direction: column-reverse;
+                  gap: 2px; min-height: 0; }
+    .bar { width: 100%; border-radius: 2px; }
+    .bar.income { background: var(--income); }
+    .bar.expense { background: var(--expense); }
+    .bar-label { font-size: 10px; color: var(--muted); text-align: center;
+                  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .legend { display: flex; gap: 20px; font-size: 12px;
+              color: var(--muted); margin-bottom: 16px; }
+    .legend-swatch { display: inline-block; width: 12px; height: 12px;
+                     border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+
+    .client-row td.bar-cell { width: 30%; padding-right: 0; }
+    .client-bar-track { background: var(--panel-2); height: 8px;
+                         border-radius: 4px; overflow: hidden; }
+    .client-bar-fill { background: var(--income); height: 100%; }
+
+    .alerts { background: var(--panel); border: 1px solid var(--warn);
+              border-left-width: 4px; border-radius: 8px; padding: 16px;
+              display: grid; gap: 8px; }
+    .alert { color: var(--ink); font-size: 13px; }
+    .alert::before { content: "⚠ "; color: var(--warn); }
+
+    .pill {
+      display: inline-block; font-size: 11px;
+      padding: 2px 8px; border-radius: 4px; font-weight: 600;
+    }
+    .pill.income { background: rgba(74, 222, 128, 0.15); color: var(--income); }
+    .pill.expense { background: rgba(248, 113, 113, 0.15); color: var(--expense); }
+
+    footer { margin-top: 48px; padding-top: 16px;
+             border-top: 1px solid var(--border);
+             color: var(--muted); font-size: 12px; text-align: center; }
+
+    @media print {
+      body { background: white; color: black; padding: 16px; }
+      .kpi, table, .chart, .alerts { background: white; border-color: #ddd;
+                                       color: black; }
+      h2 { color: #0369a1; border-color: #ddd; }
+      th { background: #f1f5f9; color: black; }
+      .kpi .label, .subtitle, .bar-label, footer { color: #475569; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Tableau de bord de facturation · Estudio Creativo Vega SL</h1>
+    <div class="subtitle">
+      Période 1 oct. 2025 – 20 mars 2026
+      &nbsp;·&nbsp;
+      16 factures analysées
+    </div>
+  </header>
+
+
+    <section>
+      <h2>Chiffre d&#39;affaires (HT) (EUR)</h2>
+      <div class="kpi-grid">
+        <div class="kpi income">
+          <div class="label">Chiffre d&#39;affaires (HT)</div>
+          <div class="value">26 750,00 €</div>
+        </div>
+        <div class="kpi income">
+          <div class="label">Chiffre d&#39;affaires (TTC)</div>
+          <div class="value">28 355,00 €</div>
+        </div>
+        <div class="kpi expense">
+          <div class="label">Dépenses (HT)</div>
+          <div class="value">588,63 €</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Solde net</div>
+          <div class="value">26 161,37 €</div>
+        </div>
+        <div class="kpi">
+          <div class="label">TVA collectée</div>
+          <div class="value">5 617,50 €</div>
+        </div>
+        <div class="kpi">
+          <div class="label">TVA déductible</div>
+          <div class="value">123,61 €</div>
+        </div>
+        <div class="kpi">
+          <div class="label">TVA à régler</div>
+          <div class="value">5 493,89 €</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Retenue à la source</div>
+          <div class="value">4 012,50 €</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Facture moyenne</div>
+          <div class="value">2 675,00 €</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Clients</div>
+          <div class="value">5</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Évolution mensuelle</h2>
+      <div class="chart">
+        <div class="legend">
+          <span><span class="legend-swatch" style="background: var(--income)"></span>Chiffre d&#39;affaires (HT)</span>
+          <span><span class="legend-swatch" style="background: var(--expense)"></span>Dépenses (HT)</span>
+        </div>
+        <div class="bars">
+          <div class="bar-col">
+            <div class="bar-stack">
+              <div class="bar income"
+                   style="height: 80.3030303030303%;"
+                   title="5 300,00 €"></div>
+              <div class="bar expense"
+                   style="height: 0.908939393939394%;"
+                   title="59,99 €"></div>
+            </div>
+            <div class="bar-label">oct. 2025</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-stack">
+              <div class="bar income"
+                   style="height: 81.81818181818183%;"
+                   title="5 400,00 €"></div>
+              <div class="bar expense"
+                   style="height: 0.7568181818181818%;"
+                   title="49,95 €"></div>
+            </div>
+            <div class="bar-label">nov. 2025</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-stack">
+              <div class="bar income"
+                   style="height: 14.393939393939394%;"
+                   title="950,00 €"></div>
+              <div class="bar expense"
+                   style="height: 2.2015151515151516%;"
+                   title="145,30 €"></div>
+            </div>
+            <div class="bar-label">déc. 2025</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-stack">
+              <div class="bar income"
+                   style="height: 45.45454545454545%;"
+                   title="3 000,00 €"></div>
+              <div class="bar expense"
+                   style="height: 3.787878787878788%;"
+                   title="250,00 €"></div>
+            </div>
+            <div class="bar-label">janv. 2026</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-stack">
+              <div class="bar income"
+                   style="height: 100.0%;"
+                   title="6 600,00 €"></div>
+              <div class="bar expense"
+                   style="height: 0.3545454545454545%;"
+                   title="23,40 €"></div>
+            </div>
+            <div class="bar-label">févr. 2026</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-stack">
+              <div class="bar income"
+                   style="height: 83.33333333333334%;"
+                   title="5 500,00 €"></div>
+              <div class="bar expense"
+                   style="height: 0.908939393939394%;"
+                   title="59,99 €"></div>
+            </div>
+            <div class="bar-label">mars 2026</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Liquidation trimestrielle de la TVA</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th class="num">TVA collectée</th>
+            <th class="num">TVA déductible</th>
+            <th class="num">TVA à régler</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2025-Q4</td>
+            <td class="num">2 446,50 €</td>
+            <td class="num">53,60 €</td>
+            <td class="num"><strong>2 392,90 €</strong></td>
+          </tr>
+          <tr>
+            <td>2026-Q1</td>
+            <td class="num">3 171,00 €</td>
+            <td class="num">70,01 €</td>
+            <td class="num"><strong>3 100,99 €</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Meilleurs clients par chiffre d&#39;affaires</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th class="num">#</th>
+            <th class="num">HT</th>
+            <th class="num">%</th>
+            <th class="bar-cell"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="client-row">
+            <td>Tech Startup Innova SL</td>
+            <td class="num">3</td>
+            <td class="num">8 250,00 €</td>
+            <td class="num">30.8%</td>
+            <td class="bar-cell">
+              <div class="client-bar-track">
+                <div class="client-bar-fill" style="width: 30.84%;"></div>
+              </div>
+            </td>
+          </tr>
+          <tr class="client-row">
+            <td>Hotel Costa Blanca SA</td>
+            <td class="num">2</td>
+            <td class="num">7 000,00 €</td>
+            <td class="num">26.2%</td>
+            <td class="bar-cell">
+              <div class="client-bar-track">
+                <div class="client-bar-fill" style="width: 26.17%;"></div>
+              </div>
+            </td>
+          </tr>
+          <tr class="client-row">
+            <td>Boutique Mariposa SL</td>
+            <td class="num">2</td>
+            <td class="num">6 700,00 €</td>
+            <td class="num">25.1%</td>
+            <td class="bar-cell">
+              <div class="client-bar-track">
+                <div class="client-bar-fill" style="width: 25.05%;"></div>
+              </div>
+            </td>
+          </tr>
+          <tr class="client-row">
+            <td>Restaurante La Mesa SL</td>
+            <td class="num">2</td>
+            <td class="num">2 400,00 €</td>
+            <td class="num">9.0%</td>
+            <td class="bar-cell">
+              <div class="client-bar-track">
+                <div class="client-bar-fill" style="width: 8.97%;"></div>
+              </div>
+            </td>
+          </tr>
+          <tr class="client-row">
+            <td>Centro Médico Salud+ SL</td>
+            <td class="num">1</td>
+            <td class="num">2 400,00 €</td>
+            <td class="num">9.0%</td>
+            <td class="bar-cell">
+              <div class="client-bar-track">
+                <div class="client-bar-fill" style="width: 8.97%;"></div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+
+  <section>
+    <h2>Détail des factures</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Numéro</th>
+          <th>Client</th>
+          <th>Description</th>
+          <th class="num">HT</th>
+          <th class="num">TVA</th>
+          <th class="num">Retenue</th>
+          <th class="num">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="pill gasto">Dépense</span></td>
+          <td>1 oct. 2025</td>
+          <td>ADBE-25-10</td>
+          <td>Adobe Systems Software Ireland Ltd</td>
+          <td>Adobe Creative Cloud All Apps - suscripción mensual</td>
+          <td class="num">59,99 €</td>
+          <td class="num">12,60 €</td>
+          <td class="num">0,00 €</td>
+          <td class="num"><strong>72,59 €</strong></td>
+        </tr>
+        <tr>
+          <td><span class="pill ingreso">Recette</span></td>
+          <td>12 oct. 2025</td>
+          <td>F-2025-018</td>
+          <td>Restaurante La Mesa SL</td>
+          <td>Diseño de identidad visual completa (logo, manual de marca, papelería corporativa)</td>
+          <td class="num">1 800,00 €</td>
+          <td class="num">378,00 €</td>
+          <td class="num">-270,00 €</td>
+          <td class="num"><strong>1 908,00 €</strong></td>
+        </tr>
+        <tr>
+          <td><span class="pill ingreso">Recette</span></td>
+          <td>28 oct. 2025</td>
+          <td>F-2025-019</td>
+          <td>Tech Startup Innova SL</td>
+          <td>Diseño y desarrollo web responsive (landing producto + 5 secciones)</td>
+          <td class="num">3 500,00 €</td>
+          <td class="num">735,00 €</td>
+          <td class="num">-525,00 €</td>
+          <td class="num"><strong>3 710,00 €</strong></td>
+        </tr>
+        <tr>
+          <td><span class="pill gasto">Dépense</span></td>
+          <td>5 nov. 2025</td>
+          <td>TEF-25-11</td>
+          <td>Telefónica de España SAU</td>
+          <td>Servicio Internet fibra 600Mb + telefonía fija oficina</td>
+          <td class="num">49,95 €</td>
+          <td class="num">10,49 €</td>
+          <td class="num">0,00 €</td>
+          <td class="num"><strong>60,44 €</strong></td>
+        </tr>
+        <tr>
+          <td><span class="pill ingreso">Recette</span></td>
+          <td>15 nov. 2025</td>
+          <td>F-2025-020</td>
+          <td>Boutique Mariposa SL</td>
+          <td>Catálogo de producto temporada otoño-invierno + sesión fotográfica</td>
+          <td class="num">1 200,00 €</td>
+          <td class="num">252,00 €</td>
+          <td class="num">-180,00 €</td>
+          <td class="num"><strong>1 272,00 €</strong></td>
+        </tr>
+        <tr>
+          <td><span class="pill ingreso">Recette</span></td>
+          <td>30 nov. 2025</td>
+          <td>F-2025-021</td>
+          <td>Hotel Costa Blanca SA</td>
+          <td>Web de reservas con motor + auditoría SEO técnica</td>
+          <td class="num">4 200,00 €</td>
+          <td class="num">882,00 €</td>
+          <td class="num">-630,00 €</td>
+          <td class="num"><strong>4 452,00 €</strong></td>
+        </tr>
+        <tr>
+          <td><span class="pill gasto">Dépense</span></td>
+          <td>10 déc. 2025</td>
+          <td>IBE-25-12</td>
+          <td>Iberdrola Clientes SAU</td>
+          <td>Suministro eléctrico oficina (consumo noviembre)</td>
+          <td class="num">145,30 €</td>
+          <td class="num">30,51 €</td>
+          <td class="num">0,00 €</td>
+          <td class="num"><strong>175,81 €</strong></td>
+        </tr>
+        <tr>
+          <td><span class="pill ingreso">Recette</span></td>
+          <td>18 déc. 2025</td>
+          <td>F-2025-022</td>
+          <td>Tech Startup Innova SL</td>
+          <td>Mantenimiento web cuarto trimestre 2025 (actualizaciones, soporte)</td>
+          <td class="num">950,00 €</td>
+          <td class="num">199,50 €</td>
+          <td class="num">-142,50 €</td>
+          <td class="num"><strong>1 007,00 €</strong></td>
+        </tr>
+        <tr>
+          <td><span class="pill ingreso">Recette</span></td>
+          <td>14 janv. 2026</td>
+          <td>F-2026-001</td>
+          <td>Centro Médico Salud+ SL</td>
+          <td>Identidad corporativa nuevo centro (naming, logo, aplicaciones)</td>
+          <td class="num">2 400,00 €</td>
+          <td class="num">504,00 €</td>
+          <td class="num">-360,00 €</td>
+          <td class="num"><strong>2 544,00 €</strong></td>
+        </tr>
+        <tr>
+          <td><span class="pill gasto">Dépense</span></td>
+          <td>15 janv. 2026</td>
+          <td>HUB-26-01</td>
+          <td>Impact Hub Madrid SL</td>
+          <td>Cuota mensual coworking (puesto fijo + sala reuniones 4h)</td>
+          <td class="num">250,00 €</td>
+          <td class="num">52,50 €</td>
+          <td class="num">0,00 €</td>
+          <td class="num"><strong>302,50 €</strong></td>
+        </tr>
+        <tr>
+          <td><span class="pill ingreso">Recette</span></td>
+          <td>29 janv. 2026</td>
+          <td>F-2026-002</td>
+          <td>Restaurante La Mesa SL</td>
+          <td>Gestión de redes sociales — enero 2026 (Instagram + TikTok)</td>
+          <td class="num">600,00 €</td>
+          <td class="num">126,00 €</td>
+          <td class="num">-90,00 €</td>
+          <td class="num"><strong>636,00 €</strong></td>
+        </tr>
+        <tr>
+          <td><span class="pill gasto">Dépense</span></td>
+          <td>8 févr. 2026</td>
+          <td>GOO-26-02</td>
+          <td>Google Cloud EMEA Limited</td>
+          <td>Google Workspace Business Standard - 3 cuentas</td>
+          <td class="num">23,40 €</td>
+          <td class="num">4,91 €</td>
+          <td class="num">0,00 €</td>
+          <td class="num"><strong>28,31 €</strong></td>
+        </tr>
+        <tr>
+          <td><span class="pill ingreso">Recette</span></td>
+          <td>12 févr. 2026</td>
+          <td>F-2026-003</td>
+          <td>Hotel Costa Blanca SA</td>
+          <td>Campaña SEO contenidos + setup Google Ads (febrero)</td>
+          <td class="num">2 800,00 €</td>
+          <td class="num">588,00 €</td>
+          <td class="num">-420,00 €</td>
+          <td class="num"><strong>2 968,00 €</strong></td>
+        </tr>
+        <tr>
+          <td><span class="pill ingreso">Recette</span></td>
+          <td>27 févr. 2026</td>
+          <td>F-2026-004</td>
+          <td>Tech Startup Innova SL</td>
+          <td>Rediseño completo dashboard administrador (UX/UI + frontend)</td>
+          <td class="num">3 800,00 €</td>
+          <td class="num">798,00 €</td>
+          <td class="num">-570,00 €</td>
+          <td class="num"><strong>4 028,00 €</strong></td>
+        </tr>
+        <tr>
+          <td><span class="pill gasto">Dépense</span></td>
+          <td>1 mars 2026</td>
+          <td>ADBE-26-03</td>
+          <td>Adobe Systems Software Ireland Ltd</td>
+          <td>Adobe Creative Cloud All Apps - suscripción mensual</td>
+          <td class="num">59,99 €</td>
+          <td class="num">12,60 €</td>
+          <td class="num">0,00 €</td>
+          <td class="num"><strong>72,59 €</strong></td>
+        </tr>
+        <tr>
+          <td><span class="pill ingreso">Recette</span></td>
+          <td>20 mars 2026</td>
+          <td>F-2026-005</td>
+          <td>Boutique Mariposa SL</td>
+          <td>Tienda online Shopify (configuración, diseño, migración productos)</td>
+          <td class="num">5 500,00 €</td>
+          <td class="num">1 155,00 €</td>
+          <td class="num">-825,00 €</td>
+          <td class="num"><strong>5 830,00 €</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Alertes et observations</h2>
+    <div class="alerts">
+      <div class="alert">Tendance à la hausse (+29.61 % vs trimestre précédent)</div>
+    </div>
+  </section>
+
+  <footer>
+    Généré le 2026-05-12
+    &nbsp;·&nbsp;
+    Généré avec le kit Invoice Dashboard
+  </footer>
+</body>
+</html>

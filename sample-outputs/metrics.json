@@ -1,0 +1,123 @@
+{
+  "lang": "en",
+  "company": "Estudio Creativo Vega SL",
+  "period": {
+    "start": "2025-10-01",
+    "end": "2026-03-20"
+  },
+  "count_total": 16,
+  "count_ingresos": 10,
+  "count_gastos": 6,
+  "currencies": [
+    "EUR"
+  ],
+  "by_currency": {
+    "EUR": {
+      "currency": "EUR",
+      "ingresos_neto": 26750.0,
+      "ingresos_bruto": 28355.0,
+      "gastos_neto": 588.63,
+      "gastos_bruto": 712.24,
+      "balance_neto": 26161.37,
+      "iva_repercutido": 5617.5,
+      "iva_soportado": 123.61,
+      "iva_a_liquidar": 5493.89,
+      "irpf_retenido": 4012.5,
+      "factura_media": 2675.0,
+      "count_ingresos": 10,
+      "count_gastos": 6,
+      "client_count": 5,
+      "monthly_evolution": [
+        {
+          "month": "2025-10",
+          "ingresos_neto": 5300.0,
+          "gastos_neto": 59.99
+        },
+        {
+          "month": "2025-11",
+          "ingresos_neto": 5400.0,
+          "gastos_neto": 49.95
+        },
+        {
+          "month": "2025-12",
+          "ingresos_neto": 950.0,
+          "gastos_neto": 145.3
+        },
+        {
+          "month": "2026-01",
+          "ingresos_neto": 3000.0,
+          "gastos_neto": 250.0
+        },
+        {
+          "month": "2026-02",
+          "ingresos_neto": 6600.0,
+          "gastos_neto": 23.4
+        },
+        {
+          "month": "2026-03",
+          "ingresos_neto": 5500.0,
+          "gastos_neto": 59.99
+        }
+      ],
+      "quarterly_vat": [
+        {
+          "quarter": "2025-Q4",
+          "iva_collected": 2446.5,
+          "iva_paid": 53.6,
+          "iva_net": 2392.9
+        },
+        {
+          "quarter": "2026-Q1",
+          "iva_collected": 3171.0,
+          "iva_paid": 70.01,
+          "iva_net": 3100.99
+        }
+      ],
+      "top_clients": [
+        {
+          "client": "Tech Startup Innova SL",
+          "invoice_count": 3,
+          "net_revenue": 8250.0,
+          "pct": 30.84
+        },
+        {
+          "client": "Hotel Costa Blanca SA",
+          "invoice_count": 2,
+          "net_revenue": 7000.0,
+          "pct": 26.17
+        },
+        {
+          "client": "Boutique Mariposa SL",
+          "invoice_count": 2,
+          "net_revenue": 6700.0,
+          "pct": 25.05
+        },
+        {
+          "client": "Restaurante La Mesa SL",
+          "invoice_count": 2,
+          "net_revenue": 2400.0,
+          "pct": 8.97
+        },
+        {
+          "client": "Centro Médico Salud+ SL",
+          "invoice_count": 1,
+          "net_revenue": 2400.0,
+          "pct": 8.97
+        }
+      ],
+      "trend": {
+        "direction": "up",
+        "pct": 29.61
+      }
+    }
+  },
+  "alerts": [
+    {
+      "key": "trend_up",
+      "params": {
+        "pct": 29.61
+      }
+    }
+  ],
+  "source_warnings": []
+}

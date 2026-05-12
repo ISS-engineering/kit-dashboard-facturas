@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+
+# uv
+.python-version
+
+# Generated outputs at the kit root (regenerate from PDFs anytime)
+/facturas_datos.json
+/metrics.json
+/dashboard-facturacion.html
+/dashboard-*.html
+
+# But the curated samples ARE checked in (see sample-outputs/) so buyers can
+# preview the kit's output without running the pipeline themselves.
+!sample-outputs/
+
+# OS / editor noise
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Buyer's actual invoices — never commit personal financial data
+facturas/ingresos/*.pdf
+facturas/gastos/*.pdf
+!facturas/ingresos/.gitkeep
+!facturas/gastos/.gitkeep

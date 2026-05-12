@@ -1,0 +1,65 @@
+{
+  "lang_code": "it",
+  "lang_native_name": "Italiano",
+  "formatting_locale": "it_IT",
+  "ui": {
+    "page_title": "Dashboard di fatturazione · {company}",
+    "dashboard_title": "Dashboard di fatturazione",
+    "subtitle_period": "Periodo {start} – {end}",
+    "subtitle_count": "{count} fatture analizzate",
+    "kpi": {
+      "total_billed_net": "Fatturato (netto)",
+      "total_billed_gross": "Fatturato (lordo)",
+      "total_expenses_net": "Spese (nette)",
+      "balance_net": "Saldo netto",
+      "vat_collected": "IVA a debito",
+      "vat_paid": "IVA a credito",
+      "vat_to_settle": "IVA da versare",
+      "irpf_withheld": "Ritenuta d'acconto",
+      "average_invoice": "Fattura media",
+      "client_count": "Clienti"
+    },
+    "sections": {
+      "monthly_evolution": "Andamento mensile",
+      "quarterly_vat": "Liquidazione IVA trimestrale",
+      "top_clients": "Migliori clienti per fatturato",
+      "invoice_detail": "Dettaglio fatture",
+      "alerts": "Avvisi e osservazioni"
+    },
+    "table_headers": {
+      "date": "Data",
+      "number": "Numero",
+      "issuer": "Emittente",
+      "recipient": "Cliente",
+      "concept": "Descrizione",
+      "net": "Netto",
+      "vat": "IVA",
+      "irpf": "Ritenuta",
+      "total": "Totale",
+      "type": "Tipo"
+    },
+    "type_labels": {
+      "ingreso": "Entrata",
+      "gasto": "Uscita"
+    },
+    "quarters": {
+      "q1": "T1",
+      "q2": "T2",
+      "q3": "T3",
+      "q4": "T4"
+    },
+    "alerts": {
+      "client_dependency": "Il cliente «{client}» rappresenta il {pct}% del fatturato — alta dipendenza",
+      "month_no_billing": "Nessuna fattura emessa a {month}",
+      "trend_up": "Trend in crescita (+{pct}% rispetto al trimestre precedente)",
+      "trend_down": "Trend in calo ({pct}% rispetto al trimestre precedente)",
+      "trend_flat": "Trend stabile",
+      "missing_iva": "{count} fattura/e senza IVA rilevata",
+      "mixed_currency": "Più valute rilevate — i totali restano separati per valuta"
+    },
+    "footer": {
+      "generated_on": "Generato il {date}",
+      "powered_by": "Generato con il kit Invoice Dashboard"
+    }
+  }
+}

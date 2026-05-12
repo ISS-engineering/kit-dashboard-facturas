@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="{{ lang_code }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ t.page_title.format(company=company) }}</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --panel-2: #334155;
+      --ink: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --income: #4ade80;
+      --expense: #f87171;
+      --warn: #fbbf24;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 24px;
+      font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background: var(--bg); color: var(--ink);
+    }
+    header { margin-bottom: 32px; }
+    h1 { margin: 0 0 4px; font-size: 28px; font-weight: 600; }
+    .subtitle { color: var(--muted); font-size: 14px; }
+    section { margin-bottom: 40px; }
+    h2 {
+      font-size: 16px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--accent);
+      margin: 0 0 16px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    .kpi {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 8px; padding: 16px;
+    }
+    .kpi .label {
+      font-size: 11px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;
+    }
+    .kpi .value { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .kpi.income .value { color: var(--income); }
+    .kpi.expense .value { color: var(--expense); }
+
+    table {
+      width: 100%; border-collapse: collapse;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+    }
+    th, td {
+      padding: 10px 12px; text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-variant-numeric: tabular-nums;
+    }
+    th {
+      background: var(--panel-2); font-weight: 600;
+      font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+    td.num, th.num { text-align: right; }
+    tr:last-child td { border-bottom: none; }
+
+    .chart { background: var(--panel); border: 1px solid var(--border);
+             border-radius: 8px; padding: 20px; }
+    .bars { display: flex; align-items: flex-end; gap: 12px; height: 220px;
+            padding: 0 8px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: stretch;
+               gap: 4px; min-width: 0; }
+    .bar-stack { flex: 1; display: flex; flex-direction: column-reverse;
+                  gap: 2px; min-height: 0; }
+    .bar { width: 100%; border-radius: 2px; }
+    .bar.income { background: var(--income); }
+    .bar.expense { background: var(--expense); }
+    .bar-label { font-size: 10px; color: var(--muted); text-align: center;
+                  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .legend { display: flex; gap: 20px; font-size: 12px;
+              color: var(--muted); margin-bottom: 16px; }
+    .legend-swatch { display: inline-block; width: 12px; height: 12px;
+                     border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+
+    .client-row td.bar-cell { width: 30%; padding-right: 0; }
+    .client-bar-track { background: var(--panel-2); height: 8px;
+                         border-radius: 4px; overflow: hidden; }
+    .client-bar-fill { background: var(--income); height: 100%; }
+
+    .alerts { background: var(--panel); border: 1px solid var(--warn);
+              border-left-width: 4px; border-radius: 8px; padding: 16px;
+              display: grid; gap: 8px; }
+    .alert { color: var(--ink); font-size: 13px; }
+    .alert::before { content: "⚠ "; color: var(--warn); }
+
+    .pill {
+      display: inline-block; font-size: 11px;
+      padding: 2px 8px; border-radius: 4px; font-weight: 600;
+    }
+    .pill.income { background: rgba(74, 222, 128, 0.15); color: var(--income); }
+    .pill.expense { background: rgba(248, 113, 113, 0.15); color: var(--expense); }
+
+    footer { margin-top: 48px; padding-top: 16px;
+             border-top: 1px solid var(--border);
+             color: var(--muted); font-size: 12px; text-align: center; }
+
+    @media print {
+      body { background: white; color: black; padding: 16px; }
+      .kpi, table, .chart, .alerts { background: white; border-color: #ddd;
+                                       color: black; }
+      h2 { color: #0369a1; border-color: #ddd; }
+      th { background: #f1f5f9; color: black; }
+      .kpi .label, .subtitle, .bar-label, footer { color: #475569; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>{{ t.dashboard_title }}{% if company %} · {{ company }}{% endif %}</h1>
+    <div class="subtitle">
+      {{ t.subtitle_period.format(start=period.start|fdate, end=period.end|fdate) }}
+      &nbsp;·&nbsp;
+      {{ t.subtitle_count.format(count=count_total) }}
+    </div>
+  </header>
+
+  {% for currency in currencies %}
+    {% set m = by_currency[currency] %}
+
+    <section>
+      <h2>{{ t.kpi.total_billed_net }} ({{ currency }})</h2>
+      <div class="kpi-grid">
+        <div class="kpi income">
+          <div class="label">{{ t.kpi.total_billed_net }}</div>
+          <div class="value">{{ m.ingresos_neto | money(currency) }}</div>
+        </div>
+        <div class="kpi income">
+          <div class="label">{{ t.kpi.total_billed_gross }}</div>
+          <div class="value">{{ m.ingresos_bruto | money(currency) }}</div>
+        </div>
+        {% if m.count_gastos > 0 %}
+        <div class="kpi expense">
+          <div class="label">{{ t.kpi.total_expenses_net }}</div>
+          <div class="value">{{ m.gastos_neto | money(currency) }}</div>
+        </div>
+        <div class="kpi">
+          <div class="label">{{ t.kpi.balance_net }}</div>
+          <div class="value">{{ m.balance_neto | money(currency) }}</div>
+        </div>
+        {% endif %}
+        <div class="kpi">
+          <div class="label">{{ t.kpi.vat_collected }}</div>
+          <div class="value">{{ m.iva_repercutido | money(currency) }}</div>
+        </div>
+        {% if m.iva_soportado > 0 %}
+        <div class="kpi">
+          <div class="label">{{ t.kpi.vat_paid }}</div>
+          <div class="value">{{ m.iva_soportado | money(currency) }}</div>
+        </div>
+        <div class="kpi">
+          <div class="label">{{ t.kpi.vat_to_settle }}</div>
+          <div class="value">{{ m.iva_a_liquidar | money(currency) }}</div>
+        </div>
+        {% endif %}
+        {% if m.irpf_retenido > 0 %}
+        <div class="kpi">
+          <div class="label">{{ t.kpi.irpf_withheld }}</div>
+          <div class="value">{{ m.irpf_retenido | money(currency) }}</div>
+        </div>
+        {% endif %}
+        <div class="kpi">
+          <div class="label">{{ t.kpi.average_invoice }}</div>
+          <div class="value">{{ m.factura_media | money(currency) }}</div>
+        </div>
+        <div class="kpi">
+          <div class="label">{{ t.kpi.client_count }}</div>
+          <div class="value">{{ m.client_count }}</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>{{ t.sections.monthly_evolution }}</h2>
+      <div class="chart">
+        <div class="legend">
+          <span><span class="legend-swatch" style="background: var(--income)"></span>{{ t.kpi.total_billed_net }}</span>
+          {% if m.count_gastos > 0 %}
+          <span><span class="legend-swatch" style="background: var(--expense)"></span>{{ t.kpi.total_expenses_net }}</span>
+          {% endif %}
+        </div>
+        {# Precompute max for bar heights #}
+        {% set _max_ing = m.monthly_evolution | map(attribute='ingresos_neto') | max %}
+        {% set _max_gas = m.monthly_evolution | map(attribute='gastos_neto') | max %}
+        {% set _max = [_max_ing, _max_gas] | max %}
+        <div class="bars">
+          {% for row in m.monthly_evolution %}
+          <div class="bar-col">
+            <div class="bar-stack">
+              <div class="bar income"
+                   style="height: {{ (row.ingresos_neto / _max * 100) if _max > 0 else 0 }}%;"
+                   title="{{ row.ingresos_neto | money(currency) }}"></div>
+              {% if m.count_gastos > 0 %}
+              <div class="bar expense"
+                   style="height: {{ (row.gastos_neto / _max * 100) if _max > 0 else 0 }}%;"
+                   title="{{ row.gastos_neto | money(currency) }}"></div>
+              {% endif %}
+            </div>
+            <div class="bar-label">{{ row.month | fmonth }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>{{ t.sections.quarterly_vat }}</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>{{ t.table_headers.date }}</th>
+            <th class="num">{{ t.kpi.vat_collected }}</th>
+            <th class="num">{{ t.kpi.vat_paid }}</th>
+            <th class="num">{{ t.kpi.vat_to_settle }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for q in m.quarterly_vat %}
+          <tr>
+            <td>{{ q.quarter }}</td>
+            <td class="num">{{ q.iva_collected | money(currency) }}</td>
+            <td class="num">{{ q.iva_paid | money(currency) }}</td>
+            <td class="num"><strong>{{ q.iva_net | money(currency) }}</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    {% if m.top_clients %}
+    <section>
+      <h2>{{ t.sections.top_clients }}</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>{{ t.table_headers.recipient }}</th>
+            <th class="num">#</th>
+            <th class="num">{{ t.table_headers.net }}</th>
+            <th class="num">%</th>
+            <th class="bar-cell"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in m.top_clients %}
+          <tr class="client-row">
+            <td>{{ c.client }}</td>
+            <td class="num">{{ c.invoice_count }}</td>
+            <td class="num">{{ c.net_revenue | money(currency) }}</td>
+            <td class="num">{{ c.pct | fpct }}</td>
+            <td class="bar-cell">
+              <div class="client-bar-track">
+                <div class="client-bar-fill" style="width: {{ c.pct }}%;"></div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+    {% endif %}
+
+  {% endfor %}
+
+  <section>
+    <h2>{{ t.sections.invoice_detail }}</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>{{ t.table_headers.type }}</th>
+          <th>{{ t.table_headers.date }}</th>
+          <th>{{ t.table_headers.number }}</th>
+          <th>{{ t.table_headers.recipient }}</th>
+          <th>{{ t.table_headers.concept }}</th>
+          <th class="num">{{ t.table_headers.net }}</th>
+          <th class="num">{{ t.table_headers.vat }}</th>
+          <th class="num">{{ t.table_headers.irpf }}</th>
+          <th class="num">{{ t.table_headers.total }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for inv in invoices | sort(attribute='fecha') %}
+        <tr>
+          <td><span class="pill {{ inv.tipo }}">{{ t.type_labels[inv.tipo] }}</span></td>
+          <td>{{ inv.fecha | fdate }}</td>
+          <td>{{ inv.numero }}</td>
+          <td>{{ (inv.receptor if inv.tipo == 'ingreso' else inv.emisor) }}</td>
+          <td>{{ inv.concepto }}</td>
+          <td class="num">{{ inv.base_imponible | money(inv.moneda) }}</td>
+          <td class="num">{{ (inv.iva_cantidad or 0) | money(inv.moneda) }}</td>
+          <td class="num">{{ (inv.irpf_cantidad or 0) | money(inv.moneda) }}</td>
+          <td class="num"><strong>{{ inv.total | money(inv.moneda) }}</strong></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  {% if alerts %}
+  <section>
+    <h2>{{ t.sections.alerts }}</h2>
+    <div class="alerts">
+      {% for a in alerts %}
+      <div class="alert">{{ a }}</div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <footer>
+    {{ t.footer.generated_on.format(date=generated_at) }}
+    &nbsp;·&nbsp;
+    {{ t.footer.powered_by }}
+  </footer>
+</body>
+</html>

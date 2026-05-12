@@ -1,0 +1,65 @@
+{
+  "lang_code": "es",
+  "lang_native_name": "Español",
+  "formatting_locale": "es_ES",
+  "ui": {
+    "page_title": "Dashboard de facturación · {company}",
+    "dashboard_title": "Dashboard de facturación",
+    "subtitle_period": "Periodo {start} – {end}",
+    "subtitle_count": "{count} facturas analizadas",
+    "kpi": {
+      "total_billed_net": "Facturación neta",
+      "total_billed_gross": "Facturación bruta",
+      "total_expenses_net": "Gastos netos",
+      "balance_net": "Balance neto",
+      "vat_collected": "IVA repercutido",
+      "vat_paid": "IVA soportado",
+      "vat_to_settle": "IVA a liquidar",
+      "irpf_withheld": "IRPF retenido",
+      "average_invoice": "Factura media",
+      "client_count": "Clientes"
+    },
+    "sections": {
+      "monthly_evolution": "Evolución mensual",
+      "quarterly_vat": "Liquidación de IVA por trimestre",
+      "top_clients": "Top clientes por facturación",
+      "invoice_detail": "Detalle de facturas",
+      "alerts": "Alertas y observaciones"
+    },
+    "table_headers": {
+      "date": "Fecha",
+      "number": "Número",
+      "issuer": "Emisor",
+      "recipient": "Cliente",
+      "concept": "Concepto",
+      "net": "Base imponible",
+      "vat": "IVA",
+      "irpf": "IRPF",
+      "total": "Total",
+      "type": "Tipo"
+    },
+    "type_labels": {
+      "ingreso": "Ingreso",
+      "gasto": "Gasto"
+    },
+    "quarters": {
+      "q1": "T1",
+      "q2": "T2",
+      "q3": "T3",
+      "q4": "T4"
+    },
+    "alerts": {
+      "client_dependency": "El cliente «{client}» supone el {pct}% de la facturación — alta dependencia",
+      "month_no_billing": "No se emitieron facturas en {month}",
+      "trend_up": "Tendencia ascendente (+{pct}% respecto al trimestre anterior)",
+      "trend_down": "Tendencia descendente ({pct}% respecto al trimestre anterior)",
+      "trend_flat": "Tendencia estable",
+      "missing_iva": "{count} factura(s) sin IVA detectado",
+      "mixed_currency": "Las facturas usan varias monedas — los totales se mantienen separados por moneda"
+    },
+    "footer": {
+      "generated_on": "Generado el {date}",
+      "powered_by": "Generado con el kit Dashboard de Facturas"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "dashboard-facturas",
+  "version": "0.1.0",
+  "description": "Multilingual invoice dashboard from PDF invoices. Parses PDFs (pdfplumber), computes deterministic financial metrics (totals, quarterly VAT, top clients, trends), and renders a self-contained HTML dashboard in English, Spanish, German, French, or Italian.",
+  "author": {
+    "name": "ISS Engineering",
+    "email": "inteligent.software.solutions@gmail.com"
+  },
+  "homepage": "https://github.com/ISS-engineering/kit-dashboard-facturas",
+  "repository": "https://github.com/ISS-engineering/kit-dashboard-facturas",
+  "license": "MIT",
+  "keywords": [
+    "invoices",
+    "facturas",
+    "billing",
+    "dashboard",
+    "VAT",
+    "IRPF",
+    "multilingual",
+    "financial",
+    "PDF",
+    "spanish"
+  ],
+  "skills": "./.claude/skills/"
+}
