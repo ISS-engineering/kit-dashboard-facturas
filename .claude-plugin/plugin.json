@@ -1,6 +1,6 @@
 {
   "name": "dashboard-facturas",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Multilingual invoice dashboard from PDF invoices. Parses PDFs (pdfplumber), computes deterministic financial metrics (totals, quarterly VAT, top clients, trends), and renders a self-contained HTML dashboard in English, Spanish, German, French, or Italian.",
   "author": {
     "name": "ISS Engineering",

@@ -9,7 +9,7 @@
       "name": "dashboard-facturas",
       "source": "./",
       "description": "Multilingual invoice dashboard from PDF invoices — EN / ES / DE / FR / IT",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "keywords": ["invoices", "billing", "VAT", "IRPF", "multilingual"]
     }
   ]
