@@ -6,9 +6,9 @@ compatibility: Requires Python 3.10+ and uv (https://docs.astral.sh/uv/). Script
 user-invocable: true
 metadata:
   author: ISS Engineering
-  version: "0.1.1"
+  version: "0.1.2"
   source: https://github.com/ISS-engineering/kit-dashboard-facturas
-allowed-tools: Bash(./.claude/skills/dashboard-facturas/scripts/parse-invoices.py:*) Bash(./.claude/skills/dashboard-facturas/scripts/calculate-metrics.py:*) Bash(./.claude/skills/dashboard-facturas/scripts/render-dashboard.py:*) Bash(${CLAUDE_PLUGIN_ROOT}/.claude/skills/dashboard-facturas/scripts/parse-invoices.py:*) Bash(${CLAUDE_PLUGIN_ROOT}/.claude/skills/dashboard-facturas/scripts/calculate-metrics.py:*) Bash(${CLAUDE_PLUGIN_ROOT}/.claude/skills/dashboard-facturas/scripts/render-dashboard.py:*) Bash(uv:*) Bash(open:*) Read Write
+allowed-tools: Bash(${CLAUDE_SKILL_DIR}/scripts/parse-invoices.py:*) Bash(${CLAUDE_SKILL_DIR}/scripts/calculate-metrics.py:*) Bash(${CLAUDE_SKILL_DIR}/scripts/render-dashboard.py:*) Bash(uv:*) Bash(open:*) Read Write
 ---
 
 # Invoice Dashboard
@@ -34,12 +34,9 @@ Respond in the user's language. Detect from their first message; default to Engl
 
 ## Workflow
 
-**Where the scripts live**: this skill ships in two modes, so use the shell expansion `${CLAUDE_PLUGIN_ROOT:-.}` as the base for every script and asset path in your commands. It does the right thing automatically:
+**Where the scripts live**: Claude Code sets `${CLAUDE_SKILL_DIR}` to this skill's own directory (the folder containing this `SKILL.md`) every time the skill fires. Use it as the base for every script and asset path in your commands — it resolves correctly whether the skill is project-local (`.claude/skills/dashboard-facturas/`) or plugin-installed (`~/.claude/plugins/marketplaces/<mp>/.claude/skills/dashboard-facturas/`).
 
-- **Plugin install** — `CLAUDE_PLUGIN_ROOT` is set by Claude Code to the plugin's install directory, so the shell expands to the absolute path of the installed plugin.
-- **Kit / project mode** — the variable is unset, so `${CLAUDE_PLUGIN_ROOT:-.}` falls back to `.` and the relative paths resolve against the current project (which must contain `CLAUDE.md` at its root).
-
-The user's `cwd` should be the folder containing their `facturas/` directory and where the output dashboard will be written. The scripts are reached via the `${CLAUDE_PLUGIN_ROOT:-.}` prefix; user-supplied inputs (`facturas/ingresos`, etc.) are reached via plain relative paths from `cwd`.
+The user's `cwd` should be the folder containing their `facturas/` directory and where the output dashboard will be written. Scripts and bundled assets are reached via `${CLAUDE_SKILL_DIR}/...`; user-supplied inputs (`facturas/ingresos`, etc.) are reached via plain relative paths from `cwd`.
 
 **Reproducibility flag**: every script accepts `--frozen-date YYYY-MM-DD`. Pass it when you want byte-identical outputs across runs (e.g. test scenarios). Omit it for normal use — the scripts default to today's date.
 
@@ -54,7 +51,7 @@ If they're in a different folder, accept any absolute or relative path. If only 
 Run the parser. It produces a single JSON with one entry per PDF:
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT:-.}/.claude/skills/dashboard-facturas/scripts/parse-invoices.py" \
+"${CLAUDE_SKILL_DIR}/scripts/parse-invoices.py" \
   --ingresos facturas/ingresos \
   --gastos facturas/gastos \
   --lang <lang> \
@@ -70,7 +67,7 @@ See [references/invoice-fields.md](references/invoice-fields.md) for the JSON sc
 Run the metrics calculator. It consumes `facturas_datos.json` and produces a metrics JSON:
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT:-.}/.claude/skills/dashboard-facturas/scripts/calculate-metrics.py" \
+"${CLAUDE_SKILL_DIR}/scripts/calculate-metrics.py" \
   --in facturas_datos.json \
   --lang <lang> \
   --out metrics.json
@@ -81,12 +78,12 @@ All math (totals, quarterly VAT, top clients, trends, monthly evolution) is comp
 ### Step 4 — Render the dashboard
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT:-.}/.claude/skills/dashboard-facturas/scripts/render-dashboard.py" \
+"${CLAUDE_SKILL_DIR}/scripts/render-dashboard.py" \
   --metrics metrics.json \
   --invoices facturas_datos.json \
   --lang <lang> \
-  --template "${CLAUDE_PLUGIN_ROOT:-.}/.claude/skills/dashboard-facturas/assets/dashboard-template.html" \
-  --locales "${CLAUDE_PLUGIN_ROOT:-.}/.claude/skills/dashboard-facturas/assets/locales" \
+  --template "${CLAUDE_SKILL_DIR}/assets/dashboard-template.html" \
+  --locales "${CLAUDE_SKILL_DIR}/assets/locales" \
   --out dashboard-facturacion.html
 ```
 
